@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+.env.production
+*.log
+dist/
+build/
+.next/
+.cache/
+.DS_Store
+coverage/
+*.pid
+*.seed
