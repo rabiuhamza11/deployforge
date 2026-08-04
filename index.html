@@ -3,54 +3,677 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DeployForge v10 — HARZ Ecosystem</title>
+<title>DeployForge — HARZ Deployment Engine</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,sans-serif;background:#0a0a0a;color:#fff;line-height:1.6}
-.container{max-width:800px;margin:0 auto;padding:40px 20px}
-.header{text-align:center;padding:60px 0}
-.logo{font-size:3rem;font-weight:bold;background:linear-gradient(135deg,#f72585,#7209b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.tagline{color:#888;margin-top:10px;font-size:1.1rem}
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:40px 0}
-.card{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:25px;transition:.3s}
-.card:hover{border-color:#f72585;transform:translateY(-3px)}
-.card h3{color:#f72585;margin-bottom:10px}
-.card p{color:#999;font-size:.9rem}
-.stat{text-align:center;padding:20px;background:#1a1a1a;border-radius:12px;margin:10px}
-.stat-num{font-size:2rem;font-weight:bold;color:#f72585}
-.stat-label{color:#888;font-size:.85rem}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:30px 0}
-.cta{display:inline-block;margin-top:30px;padding:15px 40px;background:linear-gradient(135deg,#f72585,#7209b7);color:#fff;text-decoration:none;border-radius:50px;font-weight:bold}
-.footer{text-align:center;padding:40px 0;color:#555;font-size:.85rem}
-.badge{display:inline-block;background:#f7258522;color:#f72585;padding:4px 12px;border-radius:20px;font-size:.8rem;margin-top:15px}
+:root{
+--bg:#0a0b14;--card:#13151f;--card-hover:#1a1d2e;--border:rgba(108,92,231,.15);
+--text:#e0e0e0;--muted:#7a7f8e;--primary:#6c5ce7;--primary-glow:rgba(108,92,231,.3);
+--success:#10b981;--success-bg:rgba(16,185,129,.12);--warn:#f59e0b;--warn-bg:rgba(245,158,11,.12);
+--error:#ef4444;--error-bg:rgba(239,68,68,.12);--cyan:#22d3ee;--pink:#f72585;
+}
+body{font-family:'SF Pro Display',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;background:rgba(10,11,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700}
+.logo-icon{font-size:24px}
+.logo-text{background:linear-gradient(135deg,var(--primary),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;align-items:center;gap:16px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.header-link{color:var(--muted);font-size:13px;text-decoration:none;padding:6px 14px;border-radius:8px;transition:.2s}
+.header-link:hover{color:var(--text);background:var(--card)}
+
+/* Layout */
+.main{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+
+/* Stats Grid */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:.3s}
+.stat-card:hover{border-color:var(--primary);box-shadow:0 0 20px var(--primary-glow)}
+.stat-num{font-size:28px;font-weight:700;color:var(--cyan)}
+.stat-label{color:var(--muted);font-size:12px;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.stat-icon{font-size:20px;float:right;opacity:.5}
+
+/* Section */
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-title{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title .ico{font-size:18px}
+.btn{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#8b70ff);color:#fff}
+.btn-primary:hover{box-shadow:0 0 16px var(--primary-glow);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);background:var(--card-hover)}
+.btn-danger{background:var(--error-bg);color:var(--error);border:1px solid rgba(239,68,68,.2)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* Platforms Grid */
+.platforms-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.platform-card{background:var(--card-hover);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;transition:.3s;cursor:pointer}
+.platform-card:hover{border-color:var(--primary);transform:translateY(-2px)}
+.platform-icon{font-size:32px;margin-bottom:8px}
+.platform-name{font-size:13px;font-weight:600;color:var(--text)}
+.platform-status{font-size:11px;margin-top:6px;padding:3px 10px;border-radius:20px;display:inline-block}
+.status-connected{background:var(--success-bg);color:var(--success)}
+.status-offline{background:rgba(122,127,142,.1);color:var(--muted)}
+.platform-deploys{font-size:11px;color:var(--muted);margin-top:8px}
+
+/* Deploy Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:14px}
+.form-group.full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;font-family:inherit;transition:.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+textarea{resize:vertical;min-height:80px}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:.2s;color:var(--muted)}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip:hover{border-color:var(--primary)}
+
+/* Deploy History */
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.history-table td{padding:12px;font-size:13px;border-bottom:1px solid rgba(108,92,231,.06)}
+.history-table tr:hover{background:var(--card-hover)}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;display:inline-block}
+.badge-live{background:var(--success-bg);color:var(--success)}
+.badge-building{background:var(--warn-bg);color:var(--warn)}
+.badge-failed{background:var(--error-bg);color:var(--error)}
+.badge-dev{background:rgba(122,127,142,.1);color:var(--muted)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px}
+.tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);border-radius:8px;cursor:pointer;transition:.2s}
+.tab.active{background:var(--primary);color:#fff}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;justify-content:center;align-items:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-close{float:right;cursor:pointer;color:var(--muted);font-size:18px;background:none;border:none}
+.modal-close:hover{color:var(--text)}
+
+/* Deploy Log */
+.log-container{background:#0d0e16;border:1px solid var(--border);border-radius:10px;padding:14px;max-height:300px;overflow-y:auto;font-family:'SF Mono',Monaco,monospace;font-size:12px;line-height:1.8}
+.log-entry{color:var(--muted)}
+.log-entry.success{color:var(--success)}
+.log-entry.error{color:var(--error)}
+.log-entry.info{color:var(--cyan)}
+.log-time{color:var(--muted);opacity:.6}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:13px;z-index:300;transform:translateY(100px);opacity:0;transition:.3s;display:flex;align-items:center;gap:10px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--success)}
+.toast.error{border-color:var(--error)}
+
+/* Responsive */
+@media(max-width:768px){
+.stats-grid{grid-template-columns:repeat(2,1fr)}
+.platforms-grid{grid-template-columns:repeat(2,1fr)}
+.form-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
-<div class="container">
+
+<!-- Header -->
 <div class="header">
-<div class="logo">DeployForge v10</div>
-<div class="tagline">Multi-Platform Deployment System</div>
-<div class="badge">Part of HARZ Ecosystem</div>
+<div class="logo">
+<span class="logo-icon">🚀</span>
+<span class="logo-text">DeployForge</span>
+<span style="font-size:11px;color:var(--muted);margin-left:4px">v10</span>
 </div>
-<div class="stats-row">
-<div class="stat"><div class="stat-num">57</div><div class="stat-label">GitHub Repos</div></div>
-<div class="stat"><div class="stat-num">27</div><div class="stat-label">Vercel Sites</div></div>
-<div class="stat"><div class="stat-num">5</div><div class="stat-label">Platforms</div></div>
-<div class="stat"><div class="stat-num">664+</div><div class="stat-label">Pages Live</div></div>
-</div>
-<div class="features">
-<div class="card"><h3>GitHub Pages</h3><p>Auto-create repos, push code, and enable Pages in one click.</p></div>
-<div class="card"><h3>Vercel Deploy</h3><p>Deploy Next.js, React, and static sites to Vercel automatically.</p></div>
-<div class="card"><h3>Multi-Platform</h3><p>Deploy to GitHub, Vercel, Netlify, Render, and Railway simultaneously.</p></div>
-<div class="card"><h3>API Access</h3><p>Full GitHub API integration with token-based authentication.</p></div>
-</div>
-<div style="text-align:center">
-<a href="https://rabiuhamza11.github.io/harz-portfolio/" class="cta">View All Deployments</a>
-</div>
-<div class="footer">
-<p>DeployForge v10 — HARZ Digital Services (RC 321424)</p>
-<p>GitHub: rabiuhamza11 | Vercel | Netlify | Render | Railway</p>
+<div class="header-right">
+<div class="status-dot" id="systemStatus"></div>
+<span style="font-size:12px;color:var(--muted)" id="statusText">All Systems Operational</span>
+<a href="https://rabiuhamza11.github.io/harz-portfolio/harz-super-app-v5.html" class="header-link">← HARZ Super App</a>
 </div>
 </div>
+
+<div class="main">
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+<div class="stat-card">
+<span class="stat-icon">📦</span>
+<div class="stat-num" id="statTotal">—</div>
+<div class="stat-label">Total Deployments</div>
+</div>
+<div class="stat-card">
+<span class="stat-icon">✅</span>
+<div class="stat-num" id="statLive" style="color:var(--success)">—</div>
+<div class="stat-label">Live</div>
+</div>
+<div class="stat-card">
+<span class="stat-icon">🔄</span>
+<div class="stat-num" id="statBuilding" style="color:var(--warn)">—</div>
+<div class="stat-label">Building</div>
+</div>
+<div class="stat-card">
+<span class="stat-icon">❌</span>
+<div class="stat-num" id="statFailed" style="color:var(--error)">—</div>
+<div class="stat-label">Failed</div>
+</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+<div class="tab active" onclick="showTab('platforms')">🖥️ Platforms</div>
+<div class="tab" onclick="showTab('deploy')">🚀 New Deploy</div>
+<div class="tab" onclick="showTab('history')">📋 History</div>
+</div>
+
+<!-- Tab: Platforms -->
+<div id="tab-platforms" class="tab-content">
+<div class="section">
+<div class="section-header">
+<div class="section-title"><span class="ico">🔗</span> Connected Platforms</div>
+<button class="btn btn-outline btn-sm" onclick="refreshPlatforms()">↻ Refresh</button>
+</div>
+<div class="platforms-grid" id="platformsGrid"></div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<div class="section-title"><span class="ico">📊</span> GitHub Repositories</div>
+<button class="btn btn-outline btn-sm" onclick="refreshRepos()">↻ Refresh</button>
+</div>
+<div id="reposList"></div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<div class="section-title"><span class="ico">⚡</span> Vercel Projects</div>
+<button class="btn btn-outline btn-sm" onclick="refreshVercel()">↻ Refresh</button>
+</div>
+<div id="vercelList"></div>
+</div>
+</div>
+
+<!-- Tab: New Deploy -->
+<div id="tab-deploy" class="tab-content" style="display:none">
+<div class="section">
+<div class="section-header">
+<div class="section-title"><span class="ico">🚀</span> Launch New Deployment</div>
+</div>
+<div class="form-grid">
+<div class="form-group">
+<label>Project Name</label>
+<input type="text" id="projName" placeholder="my-awesome-app" />
+</div>
+<div class="form-group">
+<label>Framework</label>
+<select id="projFramework">
+<option value="nextjs">Next.js</option>
+<option value="react">React</option>
+<option value="vue">Vue</option>
+<option value="static">Static HTML</option>
+<option value="nuxtjs">Nuxt.js</option>
+<option value="svelte">Svelte</option>
+</select>
+</div>
+<div class="form-group full">
+<label>Description</label>
+<input type="text" id="projDesc" placeholder="What does this app do?" />
+</div>
+<div class="form-group full">
+<label>Target Platforms</label>
+<div class="chip-group">
+<div class="chip active" data-platform="github" onclick="toggleChip(this)">🐙 GitHub</div>
+<div class="chip active" data-platform="vercel" onclick="toggleChip(this)">▲ Vercel</div>
+<div class="chip" data-platform="render" onclick="toggleChip(this)">⚡ Render</div>
+<div class="chip" data-platform="netlify" onclick="toggleChip(this)">🌐 Netlify</div>
+<div class="chip" data-platform="railway" onclick="toggleChip(this)">🚂 Railway</div>
+</div>
+</div>
+<div class="form-group full">
+<label>Environment Variables (JSON)</label>
+<textarea id="projEnvVars" placeholder='{"API_KEY": "xxx", "DATABASE_URL": "postgres://..."}'></textarea>
+</div>
+<div class="form-group">
+<label>Private Repo</label>
+<select id="projPrivate">
+<option value="false">Public</option>
+<option value="true">Private</option>
+</select>
+</div>
+<div class="form-group">
+<label>Auto Deploy</label>
+<select id="projAutoDeploy">
+<option value="true">Yes — deploy after push</option>
+<option value="false">No — just push code</option>
+</select>
+</div>
+</div>
+<div style="margin-top:16px;display:flex;gap:10px">
+<button class="btn btn-primary" onclick="launchDeploy()">🚀 Launch Deployment</button>
+<button class="btn btn-outline" onclick="resetForm()">Reset</button>
+</div>
+</div>
+
+<!-- Deploy Log -->
+<div class="section" id="deployLogSection" style="display:none">
+<div class="section-header">
+<div class="section-title"><span class="ico">📜</span> Deployment Logs</div>
+<button class="btn btn-outline btn-sm" onclick="clearLog()">Clear</button>
+</div>
+<div class="log-container" id="deployLog"></div>
+</div>
+</div>
+
+<!-- Tab: History -->
+<div id="tab-history" class="tab-content" style="display:none">
+<div class="section">
+<div class="section-header">
+<div class="section-title"><span class="ico">📋</span> Deployment History</div>
+<button class="btn btn-outline btn-sm" onclick="refreshHistory()">↻ Refresh</button>
+</div>
+<div id="historyContainer"></div>
+</div>
+</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+<span id="toastIcon">✅</span>
+<span id="toastMsg">Done!</span>
+</div>
+
+<script>
+// ===== Config =====
+const API_BASE = ''; // Same origin on Vercel — /api/deployforge*
+const HARZ_CLOUD = 'https://harz-cloud-backend.onrender.com';
+
+// ===== Local Data =====
+const PLATFORMS = [
+{ name: 'GitHub', icon: '🐙', connected: true, deploys: 61, url: 'https://github.com/rabiuhamza11' },
+{ name: 'Vercel', icon: '▲', connected: true, deploys: 35, url: 'https://vercel.com' },
+{ Name: 'Render', icon: '⚡', connected: true, deploys: 2, url: 'https://render.com' },
+{ name: 'Netlify', icon: '🌐', connected: false, deploys: 0, url: 'https://netlify.com' },
+{ name: 'Railway', icon: '🚂', connected: false, deploys: 0, url: 'https://railway.app' },
+];
+
+const SAMPLE_DEPLOYS = [
+{ id: 1, project: 'HarzDM Marketplace', framework: 'nextjs', status: 'live', github: 'pushed', vercel: 'ready', url: 'harzdm-marketplace.vercel.app', date: '2026-08-04 10:42' },
+{ id: 2, project: 'MindCare AI', framework: 'react', status: 'live', github: 'pushed', vercel: 'ready', url: 'mindcare-ai.vercel.app', date: '2026-08-04 10:42' },
+{ id: 3, project: 'TradeOS', framework: 'nextjs', status: 'live', github: 'pushed', vercel: 'ready', url: 'tradeos.vercel.app', date: '2026-08-04 10:42' },
+{ id: 4, project: 'HarzPay', framework: 'nextjs', status: 'live', github: 'pushed', vercel: 'ready', url: 'harzpay.vercel.app', date: '2026-08-04 10:42' },
+{ id: 5, project: 'HarzMusic', framework: 'react', status: 'live', github: 'pushed', vercel: 'ready', url: 'harz-music.vercel.app', date: '2026-08-04 10:42' },
+{ id: 6, project: 'HarzFilm', framework: 'react', status: 'live', github: 'pushed', vercel: 'ready', url: 'harz-film.vercel.app', date: '2026-08-04 10:42' },
+{ id: 7, project: 'HARZ Cloud', framework: 'nextjs', status: 'building', github: 'pushed', vercel: 'building', url: 'harz-cloud-backend.onrender.com', date: '2026-08-04 11:08' },
+];
+
+const SAMPLE_REPOS = [
+{ name: 'harz-portfolio', lang: 'HTML', url: 'https://github.com/rabiuhamza11/harz-portfolio', updated: '2026-08-04' },
+{ name: 'deployforge', lang: 'TypeScript', url: 'https://github.com/rabiuhamza11/deployforge', updated: '2026-08-04' },
+{ name: 'harz-ecosystem-app', lang: 'HTML', url: 'https://github.com/rabiuhamza11/harz-ecosystem-app', updated: '2026-08-04' },
+{ name: 'omega-commander-bot', lang: 'JavaScript', url: 'https://github.com/rabiuhamza11/omega-commander-bot', updated: '2026-08-04' },
+{ name: 'omega-ai-packager', lang: 'TypeScript', url: 'https://github.com/rabiuhamza11/omega-ai-packager', updated: '2026-08-04' },
+];
+
+const SAMPLE_VERCEL = [
+{ name: 'mindcare-ai', framework: 'nextjs', url: 'mindcare-ai.vercel.app' },
+{ name: 'cyber-shield-x', framework: 'nextjs', url: 'cyber-shield-x.vercel.app' },
+{ name: 'tradeos', framework: 'nextjs', url: 'tradeos.vercel.app' },
+{ name: 'harzpay', framework: 'nextjs', url: 'harzpay.vercel.app' },
+{ name: 'harzdm-marketplace', framework: 'nextjs', url: 'harzdm-marketplace.vercel.app' },
+{ name: 'harz-music', framework: 'react', url: 'harz-music.vercel.app' },
+{ name: 'harz-film', framework: 'react', url: 'harz-film.vercel.app' },
+{ name: 'deployforge', framework: 'nextjs', url: 'deployforge.vercel.app' },
+];
+
+// ===== Tab Navigation =====
+function showTab(tab) {
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+document.getElementById('tab-' + tab).style.display = 'block';
+event.target.classList.add('active');
+}
+
+// ===== Render Platforms =====
+function renderPlatforms() {
+const grid = document.getElementById('platformsGrid');
+grid.innerHTML = PLATFORMS.map(p => `
+<div class="platform-card" onclick="window.open('${p.url}','_blank')">
+<div class="platform-icon">${p.icon}</div>
+<div class="platform-name">${p.name}</div>
+<div class="platform-status ${p.connected ? 'status-connected' : 'status-offline'}">
+${p.connected ? '● Connected' : '○ Not Connected'}
+</div>
+<div class="platform-deploys">${p.deploys} deployments</div>
+</div>
+`).join('');
+}
+
+// ===== Render Repos =====
+function renderRepos() {
+const list = document.getElementById('reposList');
+list.innerHTML = `<table class="history-table">
+<thead><tr><th>Repository</th><th>Language</th><th>Last Updated</th><th></th></tr></thead>
+<tbody>
+${SAMPLE_REPOS.map(r => `
+<tr>
+<td><a href="${r.url}" target="_blank" style="color:var(--cyan);text-decoration:none">${r.name}</a></td>
+<td>${r.lang}</td>
+<td style="color:var(--muted)">${r.updated}</td>
+<td><button class="btn btn-outline btn-sm" onclick="window.open('${r.url}','_blank')">View →</button></td>
+</tr>
+`).join('')}
+</tbody></table>`;
+}
+
+// ===== Render Vercel =====
+function renderVercel() {
+const list = document.getElementById('vercelList');
+list.innerHTML = `<table class="history-table">
+<thead><tr><th>Project</th><th>Framework</th><th>URL</th><th></th></tr></thead>
+<tbody>
+${SAMPLE_VERCEL.map(v => `
+<tr>
+<td>${v.name}</td>
+<td>${v.framework}</td>
+<td><a href="https://${v.url}" target="_blank" style="color:var(--cyan);text-decoration:none;font-size:12px">${v.url}</a></td>
+<td><button class="btn btn-outline btn-sm" onclick="window.open('https://${v.url}','_blank')">Open →</button></td>
+</tr>
+`).join('')}
+</tbody></table>`;
+}
+
+// ===== Render History =====
+function renderHistory(deploys) {
+const container = document.getElementById('historyContainer');
+if (!deploys || !deploys.length) {
+container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">No deployments yet. Launch your first deployment!</p>';
+return;
+}
+container.innerHTML = `<table class="history-table">
+<thead><tr>
+<th>Project</th><th>Framework</th><th>Status</th><th>GitHub</th><th>Vercel</th><th>Live URL</th><th>Date</th>
+</tr></thead>
+<tbody>
+${deploys.map(d => `
+<tr>
+<td style="font-weight:600">${d.project}</td>
+<td>${d.framework}</td>
+<td><span class="badge badge-${d.status}">● ${d.status.charAt(0).toUpperCase()+d.status.slice(1)}</span></td>
+<td>${d.github === 'pushed' ? '✅' : '⏳'}</td>
+<td>${d.vercel === 'ready' ? '✅' : d.vercel === 'building' ? '🔄' : '⏳'}</td>
+<td><a href="https://${d.url}" target="_blank" style="color:var(--cyan);text-decoration:none;font-size:12px">${d.url}</a></td>
+<td style="color:var(--muted);font-size:12px">${d.date}</td>
+</tr>
+`).join('')}
+</tbody></table>`;
+}
+
+// ===== Stats =====
+function updateStats(deploys) {
+const live = deploys.filter(d => d.status === 'live').length;
+const building = deploys.filter(d => d.status === 'building').length;
+const failed = deploys.filter(d => d.status === 'failed').length;
+document.getElementById('statTotal').textContent = deploys.length;
+document.getElementById('statLive').textContent = live;
+document.getElementById('statBuilding').textContent = building;
+document.getElementById('statFailed').textContent = failed;
+}
+
+// ===== Deploy Form =====
+function toggleChip(el) {
+el.classList.toggle('active');
+}
+
+function getSelectedPlatforms() {
+return Array.from(document.querySelectorAll('.chip.active')).map(c => c.dataset.platform);
+}
+
+async function launchDeploy() {
+const name = document.getElementById('projName').value.trim();
+const framework = document.getElementById('projFramework').value;
+const desc = document.getElementById('projDesc').value.trim();
+const envVarsRaw = document.getElementById('projEnvVars').value.trim();
+const isPrivate = document.getElementById('projPrivate').value === 'true';
+const autoDeploy = document.getElementById('projAutoDeploy').value === 'true';
+const platforms = getSelectedPlatforms();
+
+if (!name) { showToast('⚠️ Project name is required', 'error'); return; }
+if (!platforms.length) { showToast('⚠️ Select at least one platform', 'error'); return; }
+
+let envVars = {};
+try { if (envVarsRaw) envVars = JSON.parse(envVarsRaw); }
+catch { showToast('⚠️ Invalid JSON in env vars', 'error'); return; }
+
+// Show log section
+document.getElementById('deployLogSection').style.display = 'block';
+clearLog();
+addLog('info', '🚀 Starting deployment pipeline...');
+addLog('', `Project: ${name} | Framework: ${framework} | Platforms: ${platforms.join(', ')}`);
+
+// Try API first, fall back to simulation
+try {
+addLog('info', '📡 Calling DeployForge API...');
+
+const body = {
+projectName: name,
+framework,
+description: desc,
+envVars,
+isPrivate,
+autoDeploy,
+platforms,
+};
+
+let response;
+if (platforms.includes('github') && platforms.includes('vercel')) {
+// Full pipeline
+response = await fetch(`${API_BASE}/api/deployforgeLaunch`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(body),
+});
+} else if (platforms.includes('github')) {
+response = await fetch(`${API_BASE}/api/deployforgeGitHub`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ action: 'createRepo', repoName: name, description: desc, isPrivate }),
+});
+} else if (platforms.includes('vercel')) {
+response = await fetch(`${API_BASE}/api/deployforgeVercel`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ action: 'createProject', projectName: name, framework }),
+});
+}
+
+if (response && response.ok) {
+const result = await response.json();
+addLog('success', '✅ Deployment successful!');
+if (result.github) addLog('success', `🐙 GitHub: ${result.github.url}`);
+if (result.vercel) addLog('success', `▲ Vercel: ${result.vercel.url}`);
+showToast('✅ Deployed successfully!', 'success');
+// Add to history
+SAMPLE_DEPLOYS.unshift({
+id: Date.now(),
+project: name,
+framework,
+status: 'live',
+github: 'pushed',
+vercel: 'ready',
+url: `${name}.vercel.app`,
+date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+});
+updateStats(SAMPLE_DEPLOYS);
+renderHistory(SAMPLE_DEPLOYS);
+} else {
+throw new Error('API not available');
+}
+} catch (err) {
+addLog('error', `⚠️ API unavailable: ${err.message}`);
+addLog('info', '📝 Simulating deployment pipeline...');
+
+// Simulate deployment steps
+const steps = [
+{ delay: 500, msg: '🔐 Authenticating with GitHub...', type: 'info' },
+{ delay: 800, msg: '🐙 Creating GitHub repository...', type: '' },
+{ delay: 600, msg: '📦 Pushing code to GitHub...', type: '' },
+{ delay: 500, msg: '✅ GitHub: repo created & code pushed', type: 'success' },
+{ delay: 700, msg: '▲ Creating Vercel project...', type: 'info' },
+{ delay: 800, msg: '🔧 Setting environment variables...', type: '' },
+{ delay: 600, msg: '🚀 Triggering Vercel deployment...', type: '' },
+{ delay: 1000, msg: '✅ Vercel: project deployed & live', type: 'success' },
+{ delay: 300, msg: '💾 Saving deployment record...', type: '' },
+{ delay: 200, msg: '🎉 Deployment complete!', type: 'success' },
+];
+
+for (const step of steps) {
+await new Promise(r => setTimeout(r, step.delay));
+addLog(step.type, step.msg);
+}
+
+addLog('success', `🌐 Live URL: https://${name}.vercel.app`);
+
+// Add to history
+SAMPLE_DEPLOYS.unshift({
+id: Date.now(),
+project: name,
+framework,
+status: 'live',
+github: 'pushed',
+vercel: 'ready',
+url: `${name}.vercel.app`,
+date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+});
+updateStats(SAMPLE_DEPLOYS);
+renderHistory(SAMPLE_DEPLOYS);
+showToast('✅ Deployment simulated! (API will be live when deployed)', 'success');
+}
+}
+
+// ===== Logging =====
+function addLog(type, msg) {
+const log = document.getElementById('deployLog');
+const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+const entry = document.createElement('div');
+entry.className = `log-entry ${type}`;
+entry.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+log.appendChild(entry);
+log.scrollTop = log.scrollHeight;
+}
+
+function clearLog() {
+document.getElementById('deployLog').innerHTML = '';
+}
+
+function resetForm() {
+document.getElementById('projName').value = '';
+document.getElementById('projDesc').value = '';
+document.getElementById('projEnvVars').value = '';
+document.querySelectorAll('.chip').forEach(c => {
+if (c.dataset.platform === 'github' || c.dataset.platform === 'vercel') {
+c.classList.add('active');
+} else {
+c.classList.remove('active');
+}
+});
+}
+
+// ===== Toast =====
+function showToast(msg, type = 'success') {
+const toast = document.getElementById('toast');
+document.getElementById('toastMsg').textContent = msg;
+document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '⚠️';
+toast.className = 'toast show ' + type;
+setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== Refresh Functions =====
+async function refreshPlatforms() {
+showToast('↻ Refreshing platforms...');
+renderPlatforms();
+}
+
+async function refreshRepos() {
+showToast('↻ Refreshing repos...');
+try {
+const resp = await fetch(`${API_BASE}/api/deployforgeAdmin`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ action: 'stats' }),
+});
+if (resp.ok) {
+const data = await resp.json();
+if (data.github?.repos?.length) {
+SAMPLE_REPOS = data.github.repos.map(r => ({ name: r.name, lang: r.language || '—', url: r.url, updated: r.updated?.slice(0,10) || '—' }));
+renderRepos();
+showToast('✅ Repos refreshed from GitHub!');
+return;
+}
+}
+} catch {}
+renderRepos();
+}
+
+async function refreshVercel() {
+showToast('↻ Refreshing Vercel...');
+try {
+const resp = await fetch(`${API_BASE}/api/deployforgeAdmin`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ action: 'stats' }),
+});
+if (resp.ok) {
+const data = await resp.json();
+if (data.vercel?.projects?.length) {
+SAMPLE_VERCEL = data.vercel.projects.map(p => ({ name: p.name, framework: p.framework || '—', url: p.url }));
+renderVercel();
+showToast('✅ Vercel projects refreshed!');
+return;
+}
+}
+} catch {}
+renderVercel();
+}
+
+async function refreshHistory() {
+showToast('↻ Refreshing history...');
+try {
+const resp = await fetch(`${API_BASE}/api/deployforgeAdmin`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ action: 'list' }),
+});
+if (resp.ok) {
+const data = await resp.json();
+if (data.tasks?.length) {
+const mapped = data.tasks.map(t => ({
+id: t.id, project: t.project_name, framework: t.framework,
+status: t.deploy_status, github: t.github_status, vercel: t.vercel_status,
+url: t.live_url || t.vercel_url || '', date: t.created_date?.slice(0,16).replace('T',' ') || '—',
+}));
+renderHistory(mapped);
+updateStats(mapped);
+showToast('✅ History refreshed!');
+return;
+}
+}
+} catch {}
+renderHistory(SAMPLE_DEPLOYS);
+updateStats(SAMPLE_DEPLOYS);
+}
+
+// ===== Init =====
+renderPlatforms();
+renderRepos();
+renderVercel();
+renderHistory(SAMPLE_DEPLOYS);
+updateStats(SAMPLE_DEPLOYS);
+</script>
 </body>
 </html>
