@@ -1,18 +1,17 @@
 {
   "name": "deployforge",
-  "version": "1.0.0",
-  "description": "Multi-platform deployment engine (GitHub + Vercel) powering the Harz ecosystem",
-  "main": "deployforgeLaunch.ts",
+  "version": "2.0.0",
+  "description": "DeployForge — Multi-platform deployment engine (GitHub, Vercel, Render, Netlify, Railway) powering the Harz ecosystem",
+  "main": "index.html",
   "author": "Rabiu Hamza",
   "license": "MIT",
-  "keywords": [
-    "deployment",
-    "github",
-    "vercel",
-    "automation",
-    "ci-cd"
-  ],
+  "keywords": ["deployment", "github", "vercel", "render", "netlify", "railway", "automation", "ci-cd", "devops"],
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site — no build needed'",
+    "start": "npx serve ."
+  },
   "engines": {
-    "deno": ">=1.40.0"
+    "node": ">=18"
   }
 }
