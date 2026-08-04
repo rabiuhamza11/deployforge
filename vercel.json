@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "deployforge",
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/*.ts", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "env": {
+    "GITHUB_TOKEN": "@github_token",
+    "VERCEL_TOKEN": "@vercel_token"
+  }
+}
