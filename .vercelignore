@@ -4,3 +4,7 @@ deployforgeLaunch.ts
 deployforgeVercel.ts
 README.md
 .gitignore
+SETUP_VERCEL_DEPLOY.md
+.github
+.vercel
+.vercelignore
